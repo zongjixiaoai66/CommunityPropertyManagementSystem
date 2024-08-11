@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ZuzhuxinxiDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.yonghu_id as yonghuId
+        ,a.zuzhuxinxi_name as zuzhuxinxiName
+        ,a.zuzhuxinxi_phone as zuzhuxinxiPhone
+        ,a.zuzhuxinxi_danyuan as zuzhuxinxiDanyuan
+        ,a.zuzhuxinxi_jine as zuzhuxinxiJine
+        ,a.zuzhuxinxi_yajin as zuzhuxinxiYajin
+        ,a.zuzhuxinxi_time as zuzhuxinxiTime
+        ,a.zuzhuxinxi_content as zuzhuxinxiContent
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ZuzhuxinxiView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,yonghu.yonghu_name as yonghuName
+        ,yonghu.yonghu_phone as yonghuPhone
+        ,yonghu.yonghu_id_number as yonghuIdNumber
+        ,yonghu.yonghu_photo as yonghuPhoto
+        ,yonghu.yonghu_email as yonghuEmail
+
+        FROM zuzhuxinxi  a
+        left JOIN yonghu yonghu ON a.yonghu_id = yonghu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.yonghuId != null and params.yonghuId != ''">
+                and (
+                    a.yonghu_id = #{params.yonghuId}
+                )
+            </if>
+            <if test=" params.zuzhuxinxiName != '' and params.zuzhuxinxiName != null and params.zuzhuxinxiName != 'null' ">
+                and a.zuzhuxinxi_name like CONCAT('%',#{params.zuzhuxinxiName},'%')
+            </if>
+            <if test=" params.zuzhuxinxiPhone != '' and params.zuzhuxinxiPhone != null and params.zuzhuxinxiPhone != 'null' ">
+                and a.zuzhuxinxi_phone like CONCAT('%',#{params.zuzhuxinxiPhone},'%')
+            </if>
+            <if test=" params.zuzhuxinxiDanyuan != '' and params.zuzhuxinxiDanyuan != null and params.zuzhuxinxiDanyuan != 'null' ">
+                and a.zuzhuxinxi_danyuan like CONCAT('%',#{params.zuzhuxinxiDanyuan},'%')
+            </if>
+            <if test="params.zuzhuxinxiJineStart != null ">
+                <![CDATA[  and a.zuzhuxinxi_jine >= #{params.zuzhuxinxiJineStart}   ]]>
+            </if>
+            <if test="params.zuzhuxinxiJineEnd != null ">
+                <![CDATA[  and a.zuzhuxinxi_jine <= #{params.zuzhuxinxiJineEnd}   ]]>
+            </if>
+            <if test="params.zuzhuxinxiYajinStart != null ">
+                <![CDATA[  and a.zuzhuxinxi_yajin >= #{params.zuzhuxinxiYajinStart}   ]]>
+            </if>
+            <if test="params.zuzhuxinxiYajinEnd != null ">
+                <![CDATA[  and a.zuzhuxinxi_yajin <= #{params.zuzhuxinxiYajinEnd}   ]]>
+            </if>
+            <if test=" params.zuzhuxinxiTimeStart != '' and params.zuzhuxinxiTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.zuzhuxinxi_time) >= UNIX_TIMESTAMP(#{params.zuzhuxinxiTimeStart}) ]]>
+            </if>
+            <if test=" params.zuzhuxinxiTimeEnd != '' and params.zuzhuxinxiTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.zuzhuxinxi_time) <= UNIX_TIMESTAMP(#{params.zuzhuxinxiTimeEnd}) ]]>
+            </if>
+            <if test=" params.zuzhuxinxiContent != '' and params.zuzhuxinxiContent != null and params.zuzhuxinxiContent != 'null' ">
+                and a.zuzhuxinxi_content like CONCAT('%',#{params.zuzhuxinxiContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+                <!-- 判断用户的id不为空 -->
+            <if test=" params.yonghuIdNotNull != '' and params.yonghuIdNotNull != null and params.yonghuIdNotNull != 'null' ">
+                and a.yonghu_id IS NOT NULL
+            </if>
+            <if test=" params.yonghuName != '' and params.yonghuName != null and params.yonghuName != 'null' ">
+                and yonghu.yonghu_name like CONCAT('%',#{params.yonghuName},'%')
+            </if>
+            <if test=" params.yonghuPhone != '' and params.yonghuPhone != null and params.yonghuPhone != 'null' ">
+                and yonghu.yonghu_phone like CONCAT('%',#{params.yonghuPhone},'%')
+            </if>
+            <if test=" params.yonghuIdNumber != '' and params.yonghuIdNumber != null and params.yonghuIdNumber != 'null' ">
+                and yonghu.yonghu_id_number like CONCAT('%',#{params.yonghuIdNumber},'%')
+            </if>
+            <if test=" params.yonghuEmail != '' and params.yonghuEmail != null and params.yonghuEmail != 'null' ">
+                and yonghu.yonghu_email like CONCAT('%',#{params.yonghuEmail},'%')
+            </if>
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
